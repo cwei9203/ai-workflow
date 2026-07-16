@@ -1,0 +1,23 @@
+{
+  "name": "ai-workflow",
+  "version": "0.2.0",
+  "description": "A constraint-driven repository workflow shared by Codex and Claude Code.",
+  "author": {"name": "AI Development Workflow Maintainers"},
+  "license": "MIT",
+  "keywords": ["coding-agent", "workflow", "verification", "knowledge"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "AI Development Workflow",
+    "shortDescription": "Constraint-driven coding workflow",
+    "longDescription": "Adopt and operate an executable repository workflow with project contracts, task evidence, verification gates, and reviewed knowledge promotion.",
+    "developerName": "AI Development Workflow Maintainers",
+    "category": "Developer Tools",
+    "capabilities": ["Instructions", "Local scripts"],
+    "defaultPrompt": [
+      "Adopt the development workflow in this repository.",
+      "Run this change through the repository workflow.",
+      "Review pending durable-knowledge candidates."
+    ],
+    "brandColor": "#2563EB"
+  }
+}

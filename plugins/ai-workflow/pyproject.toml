@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ai-development-workflow"
+version = "0.2.0"
+description = "A vendor-neutral, executable development workflow for coding agents"
+requires-python = ">=3.9"
+
+[project.scripts]
+aiw = "ai_workflow.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+ai_workflow = [
+  "templates/*.md",
+  "templates/*.json",
+  "templates/workflow/*.md",
+  "templates/knowledge/*.md",
+  "templates/knowledge/*.json",
+]

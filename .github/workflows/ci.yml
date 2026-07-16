@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: plugins/ai-workflow
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run tests
+        run: PYTHONPATH=src python -m unittest discover -s tests -v
+      - name: Validate host manifests and hooks
+        run: python scripts/validate-dual-host-plugin.py
+      - name: Compile Python sources
+        run: python -m compileall -q src hooks scripts
+      - name: Build wheel
+        run: python -m pip wheel --no-deps --wheel-dir ../../dist .

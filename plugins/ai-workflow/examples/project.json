@@ -1,0 +1,171 @@
+{
+  "$schema": "../src/ai_workflow/templates/project.schema.json",
+  "schema_version": 1,
+  "project": {
+    "name": "inventory-service",
+    "summary": "A TypeScript service that owns inventory reservations and exposes HTTP APIs to order-processing clients.",
+    "languages": [
+      "TypeScript",
+      "SQL"
+    ],
+    "platforms": [
+      "Node.js",
+      "PostgreSQL"
+    ],
+    "manifests": [
+      "package.json",
+      "pnpm-lock.yaml",
+      "tsconfig.json"
+    ],
+    "source_roots": [
+      "apps/api/src",
+      "packages/domain/src"
+    ],
+    "test_roots": [
+      "apps/api/test",
+      "packages/domain/test"
+    ],
+    "documentation_roots": [
+      "docs"
+    ]
+  },
+  "context": {
+    "read_first": [
+      "README.md",
+      "docs/architecture.md",
+      "docs/testing.md"
+    ],
+    "architecture_boundaries": [
+      "apps/api may depend on packages/domain; packages/domain must not import from apps/api.",
+      "Only packages/persistence may issue SQL or depend on the PostgreSQL driver.",
+      "Public HTTP payloads are generated from schemas/openapi and must not be edited in generated output directories."
+    ]
+  },
+  "paths": {
+    "protected": [
+      "vendor/**",
+      "third_party/**"
+    ],
+    "generated": [
+      "packages/contracts/src/generated/**"
+    ]
+  },
+  "generation": {
+    "rules": [
+      {
+        "name": "openapi-contracts",
+        "inputs": [
+          "schemas/openapi/**"
+        ],
+        "outputs": [
+          "packages/contracts/src/generated/**"
+        ],
+        "command": "generate_contracts",
+        "description": "Regenerate checked-in TypeScript contracts after an OpenAPI schema change."
+      }
+    ]
+  },
+  "commands": {
+    "lint": {
+      "run": "pnpm lint",
+      "description": "Run the repository ESLint configuration."
+    },
+    "typecheck": {
+      "run": "pnpm typecheck",
+      "description": "Type-check all TypeScript workspaces without emitting output."
+    },
+    "test_unit": {
+      "run": "pnpm test:unit",
+      "description": "Run unit tests for API and domain workspaces."
+    },
+    "test_integration": {
+      "run": "pnpm test:integration",
+      "description": "Run PostgreSQL-backed integration tests."
+    },
+    "generate_contracts": {
+      "run": "pnpm generate:contracts",
+      "description": "Generate TypeScript contracts from the OpenAPI schemas."
+    },
+    "docs": {
+      "run": "pnpm docs:check",
+      "description": "Check documentation links and code samples."
+    }
+  },
+  "verification": {
+    "default": [
+      "lint",
+      "typecheck"
+    ],
+    "rules": [
+      {
+        "name": "application-and-domain-source",
+        "patterns": [
+          "apps/*/src/**",
+          "packages/*/src/**"
+        ],
+        "require": [
+          "test_unit"
+        ]
+      },
+      {
+        "name": "persistence-and-migrations",
+        "patterns": [
+          "packages/persistence/**",
+          "database/migrations/**"
+        ],
+        "require": [
+          "test_unit",
+          "test_integration"
+        ]
+      },
+      {
+        "name": "api-schema-and-generated-contracts",
+        "patterns": [
+          "schemas/openapi/**",
+          "packages/contracts/src/generated/**"
+        ],
+        "require": [
+          "generate_contracts",
+          "test_unit",
+          "typecheck"
+        ]
+      },
+      {
+        "name": "documentation",
+        "patterns": [
+          "README.md",
+          "docs/**"
+        ],
+        "require": [
+          "docs"
+        ]
+      }
+    ]
+  },
+  "onboarding": {
+    "status": "complete",
+    "review_notes": []
+  },
+  "discovery": {
+    "evidence": [
+      {
+        "fact": "project.name",
+        "source": "package.json",
+        "value": "inventory-service"
+      },
+      {
+        "fact": "commands.test_unit",
+        "source": "package.json#scripts.test:unit",
+        "value": "pnpm test:unit"
+      },
+      {
+        "fact": "project.platforms",
+        "source": "pnpm-lock.yaml",
+        "value": [
+          "Node.js"
+        ]
+      }
+    ],
+    "warnings": []
+  }
+}

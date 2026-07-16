@@ -1,0 +1,5 @@
+#!/bin/sh
+# ai-development-workflow:managed
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+cd "$ROOT" || exit 1
+PYTHONPATH="$ROOT/src${PYTHONPATH:+:$PYTHONPATH}" exec python3 -m ai_workflow "$@"

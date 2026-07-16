@@ -1,0 +1,7 @@
+{
+  "name": "ai-workflow",
+  "version": "0.2.0",
+  "description": "A constraint-driven repository workflow shared by Codex and Claude Code.",
+  "author": {"name": "AI Development Workflow Maintainers"},
+  "hooks": "./hooks/claude-hooks.json"
+}

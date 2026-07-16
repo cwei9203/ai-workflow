@@ -1,0 +1,18 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/knowledge-candidate-reminder.py\"",
+            "commandWindows": "if (Get-Command python -ErrorAction SilentlyContinue) { python \"$env:CLAUDE_PLUGIN_ROOT\\hooks\\knowledge-candidate-reminder.py\" } elseif (Get-Command py -ErrorAction SilentlyContinue) { py -3 \"$env:CLAUDE_PLUGIN_ROOT\\hooks\\knowledge-candidate-reminder.py\" }",
+            "timeout": 5,
+            "statusMessage": "Checking durable-knowledge candidates..."
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,307 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AI Development Workflow Project Contract",
+  "description": "Machine-readable project facts and verification rules used by coding agents and the aiw runtime.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "project",
+    "context",
+    "paths",
+    "generation",
+    "commands",
+    "verification",
+    "onboarding",
+    "discovery"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "description": "Version of this project contract format."
+    },
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "summary",
+        "languages",
+        "platforms",
+        "manifests",
+        "source_roots",
+        "test_roots",
+        "documentation_roots"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string",
+          "description": "A concrete description of what the project provides. Strict onboarding requires a non-placeholder value."
+        },
+        "languages": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "platforms": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "manifests": {
+          "$ref": "#/$defs/pathArray"
+        },
+        "source_roots": {
+          "$ref": "#/$defs/pathArray"
+        },
+        "test_roots": {
+          "$ref": "#/$defs/pathArray"
+        },
+        "documentation_roots": {
+          "$ref": "#/$defs/pathArray"
+        }
+      }
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "read_first",
+        "architecture_boundaries"
+      ],
+      "properties": {
+        "read_first": {
+          "$ref": "#/$defs/pathArray",
+          "description": "Small, ordered set of repository documents an agent reads at task start."
+        },
+        "architecture_boundaries": {
+          "$ref": "#/$defs/stringArray",
+          "description": "Project-specific component responsibilities and allowed dependency directions."
+        }
+      }
+    },
+    "paths": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protected",
+        "generated"
+      ],
+      "properties": {
+        "protected": {
+          "$ref": "#/$defs/patternArray",
+          "description": "Repository-relative glob patterns that agents must not edit."
+        },
+        "generated": {
+          "$ref": "#/$defs/patternArray",
+          "description": "Repository-relative glob patterns for generated outputs."
+        }
+      }
+    },
+    "generation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rules"
+      ],
+      "properties": {
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/generationRule"
+          }
+        }
+      }
+    },
+    "commands": {
+      "type": "object",
+      "description": "Named, non-interactive commands executed from the repository root.",
+      "propertyNames": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/command"
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "default",
+        "rules"
+      ],
+      "properties": {
+        "default": {
+          "$ref": "#/$defs/commandNameArray",
+          "description": "Commands selected for every change."
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/verificationRule"
+          }
+        }
+      }
+    },
+    "onboarding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "review_notes"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "needs_review",
+            "complete"
+          ]
+        },
+        "review_notes": {
+          "$ref": "#/$defs/stringArray",
+          "description": "Unresolved semantic checks that must be cleared before onboarding completion."
+        }
+      }
+    },
+    "discovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidence",
+        "warnings"
+      ],
+      "properties": {
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/discoveryEvidence"
+          }
+        },
+        "warnings": {
+          "$ref": "#/$defs/stringArray"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "stringArray": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/nonEmptyString"
+      },
+      "uniqueItems": true
+    },
+    "pathArray": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/nonEmptyString"
+      },
+      "uniqueItems": true
+    },
+    "patternArray": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/nonEmptyString"
+      },
+      "uniqueItems": true
+    },
+    "commandNameArray": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$"
+      },
+      "uniqueItems": true
+    },
+    "command": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "run",
+        "description"
+      ],
+      "properties": {
+        "run": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "description": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "source": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "generationRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "inputs",
+        "outputs",
+        "command"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "inputs": {
+          "$ref": "#/$defs/patternArray"
+        },
+        "outputs": {
+          "$ref": "#/$defs/patternArray"
+        },
+        "command": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$"
+        },
+        "description": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "verificationRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "patterns",
+        "require"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "patterns": {
+          "$ref": "#/$defs/patternArray"
+        },
+        "require": {
+          "$ref": "#/$defs/commandNameArray"
+        }
+      }
+    },
+    "discoveryEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fact",
+        "source"
+      ],
+      "properties": {
+        "fact": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "source": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "value": {}
+      }
+    }
+  }
+}
